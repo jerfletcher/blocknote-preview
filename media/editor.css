@@ -7,27 +7,30 @@ body {
 	line-height: 1.4;
 	margin: 0;
 	padding: 0;
+	overflow: hidden;
 }
 
-#editor-container {
+#root {
 	height: 100vh;
 	width: 100%;
-	padding: 20px;
-	box-sizing: border-box;
+	overflow: hidden;
 }
 
-/* BlockNote specific styling */
+/* BlockNote container styling */
 .bn-container {
 	background-color: var(--vscode-editor-background) !important;
 	color: var(--vscode-editor-foreground) !important;
 	border: none !important;
 	font-family: var(--vscode-editor-font-family) !important;
+	height: 100% !important;
 }
 
 .bn-editor {
 	background-color: var(--vscode-editor-background) !important;
 	color: var(--vscode-editor-foreground) !important;
 	border: none !important;
+	height: 100% !important;
+	padding: 20px !important;
 }
 
 .ProseMirror {
@@ -36,37 +39,156 @@ body {
 	border: none !important;
 	outline: none !important;
 	font-family: var(--vscode-editor-font-family) !important;
+	font-size: var(--vscode-editor-font-size) !important;
 	padding: 0 !important;
+	min-height: calc(100vh - 120px) !important;
 }
 
-/* Toolbar styling */
-.bn-toolbar {
-	background-color: var(--vscode-toolbar-background) !important;
-	border-color: var(--vscode-toolbar-border) !important;
-	color: var(--vscode-toolbar-foreground) !important;
+/* Formatting menu styling */
+.bn-formatting-toolbar {
+	background-color: var(--vscode-menu-background) !important;
+	border: 1px solid var(--vscode-menu-border) !important;
+	border-radius: 4px !important;
+	box-shadow: 0 4px 8px var(--vscode-widget-shadow) !important;
 }
 
-.bn-toolbar .bn-button {
+.bn-formatting-toolbar .bn-button {
+	background-color: transparent !important;
+	color: var(--vscode-menu-foreground) !important;
+	border: none !important;
+	padding: 6px 8px !important;
+}
+
+.bn-formatting-toolbar .bn-button:hover {
+	background-color: var(--vscode-menu-selectionBackground) !important;
+	color: var(--vscode-menu-selectionForeground) !important;
+}
+
+.bn-formatting-toolbar .bn-button.bn-active {
 	background-color: var(--vscode-button-background) !important;
 	color: var(--vscode-button-foreground) !important;
-	border: 1px solid var(--vscode-button-border) !important;
 }
 
-.bn-toolbar .bn-button:hover {
-	background-color: var(--vscode-button-hoverBackground) !important;
+/* Slash menu styling */
+.bn-slash-menu {
+	background-color: var(--vscode-quickInput-background) !important;
+	border: 1px solid var(--vscode-quickInput-border) !important;
+	border-radius: 4px !important;
+	box-shadow: 0 4px 8px var(--vscode-widget-shadow) !important;
+}
+
+.bn-slash-menu .bn-menu-item {
+	color: var(--vscode-quickInput-foreground) !important;
+	padding: 8px 12px !important;
+}
+
+.bn-slash-menu .bn-menu-item:hover,
+.bn-slash-menu .bn-menu-item.bn-selected {
+	background-color: var(--vscode-list-hoverBackground) !important;
+	color: var(--vscode-list-hoverForeground) !important;
 }
 
 /* Block styling */
 .bn-block {
 	color: var(--vscode-editor-foreground) !important;
+	margin: 4px 0 !important;
+}
+
+.bn-block h1,
+.bn-block h2,
+.bn-block h3,
+.bn-block h4,
+.bn-block h5,
+.bn-block h6 {
+	color: var(--vscode-editor-foreground) !important;
+	font-family: var(--vscode-editor-font-family) !important;
+}
+
+.bn-block p {
+	color: var(--vscode-editor-foreground) !important;
+	font-family: var(--vscode-editor-font-family) !important;
+	font-size: var(--vscode-editor-font-size) !important;
+}
+
+.bn-block blockquote {
+	border-left: 4px solid var(--vscode-textBlockQuote-border) !important;
+	background-color: var(--vscode-textBlockQuote-background) !important;
+	color: var(--vscode-textBlockQuote-foreground) !important;
+	padding: 12px 16px !important;
+	margin: 8px 0 !important;
+}
+
+.bn-block pre {
+	background-color: var(--vscode-textCodeBlock-background) !important;
+	color: var(--vscode-editor-foreground) !important;
+	border: 1px solid var(--vscode-editorWidget-border) !important;
+	border-radius: 4px !important;
+	padding: 12px !important;
+	font-family: var(--vscode-editor-font-family) !important;
+}
+
+.bn-block code {
+	background-color: var(--vscode-textPreformat-background) !important;
+	color: var(--vscode-textPreformat-foreground) !important;
+	padding: 2px 4px !important;
+	border-radius: 3px !important;
+	font-family: var(--vscode-editor-font-family) !important;
+}
+
+/* List styling */
+.bn-block ul,
+.bn-block ol {
+	color: var(--vscode-editor-foreground) !important;
+	padding-left: 24px !important;
+}
+
+.bn-block li {
+	color: var(--vscode-editor-foreground) !important;
+	margin: 2px 0 !important;
 }
 
 /* Placeholder styling */
 .ProseMirror p.is-editor-empty:first-child::before {
 	color: var(--vscode-input-placeholderForeground) !important;
+	font-style: italic !important;
 }
 
 /* Selection styling */
 .ProseMirror-selectednode {
 	outline: 2px solid var(--vscode-focusBorder) !important;
+}
+
+.ProseMirror ::selection {
+	background-color: var(--vscode-editor-selectionBackground) !important;
+	color: var(--vscode-editor-selectionForeground) !important;
+}
+
+/* Link styling */
+.bn-block a {
+	color: var(--vscode-textLink-foreground) !important;
+	text-decoration: none !important;
+}
+
+.bn-block a:hover {
+	color: var(--vscode-textLink-activeForeground) !important;
+	text-decoration: underline !important;
+}
+
+/* Table styling */
+.bn-block table {
+	border-collapse: collapse !important;
+	width: 100% !important;
+	margin: 8px 0 !important;
+}
+
+.bn-block table th,
+.bn-block table td {
+	border: 1px solid var(--vscode-editorWidget-border) !important;
+	padding: 8px 12px !important;
+	color: var(--vscode-editor-foreground) !important;
+}
+
+.bn-block table th {
+	background-color: var(--vscode-editorWidget-background) !important;
+	font-weight: 600 !important;
 }

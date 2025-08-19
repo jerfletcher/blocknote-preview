@@ -70,18 +70,20 @@ export class BlockNoteEditorProvider implements vscode.CustomTextEditorProvider 
 	}
 
 	private getHtmlForWebview(webview: vscode.Webview, document: vscode.TextDocument): string {
-		// Local path to main script run in the webview
-		const scriptPathOnDisk = vscode.Uri.joinPath(this.context.extensionUri, 'media', 'editor.js');
+		// Local path to main webview script (bundled with BlockNote)
+		const scriptPathOnDisk = vscode.Uri.joinPath(this.context.extensionUri, 'media', 'webview.js');
 		// And the uri we use to load this script in the webview
 		const scriptUri = webview.asWebviewUri(scriptPathOnDisk);
 
 		// Local path to css files
 		const styleResetPath = vscode.Uri.joinPath(this.context.extensionUri, 'media', 'reset.css');
 		const styleMainPath = vscode.Uri.joinPath(this.context.extensionUri, 'media', 'editor.css');
+		const styleWebviewPath = vscode.Uri.joinPath(this.context.extensionUri, 'media', 'webview.css');
 		
 		// Uri to load styles into webview
 		const stylesResetUri = webview.asWebviewUri(styleResetPath);
 		const stylesMainUri = webview.asWebviewUri(styleMainPath);
+		const stylesWebviewUri = webview.asWebviewUri(styleWebviewPath);
 
 		// Use a nonce to only allow specific scripts to be run
 		const nonce = getNonce();
@@ -91,16 +93,44 @@ export class BlockNoteEditorProvider implements vscode.CustomTextEditorProvider 
 			<html lang="en">
 			<head>
 				<meta charset="UTF-8">
-				<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src ${webview.cspSource} 'unsafe-inline' https://unpkg.com; script-src 'nonce-${nonce}' 'unsafe-eval' 'unsafe-inline' https://unpkg.com; connect-src https://unpkg.com; img-src ${webview.cspSource} https: data:;">
+				<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src ${webview.cspSource} 'unsafe-inline'; script-src 'nonce-${nonce}'; img-src ${webview.cspSource} https: data:; font-src ${webview.cspSource};">
 				<meta name="viewport" content="width=device-width, initial-scale=1.0">
 				<link href="${stylesResetUri}" rel="stylesheet" />
 				<link href="${stylesMainUri}" rel="stylesheet" />
+				<link href="${stylesWebviewUri}" rel="stylesheet" />
+				<style>
+					/* Ensure proper styling for BlockNote */
+					body {
+						margin: 0;
+						padding: 0;
+						height: 100vh;
+						overflow: hidden;
+						background: var(--vscode-editor-background);
+						color: var(--vscode-editor-foreground);
+					}
+					
+					#root {
+						height: 100vh;
+						width: 100%;
+					}
+					
+					/* BlockNote custom styling for VS Code integration */
+					.bn-container {
+						background-color: var(--vscode-editor-background) !important;
+						color: var(--vscode-editor-foreground) !important;
+					}
+					
+					.bn-editor {
+						background-color: var(--vscode-editor-background) !important;
+						color: var(--vscode-editor-foreground) !important;
+					}
+				</style>
 				<title>BlockNote Editor</title>
 			</head>
 			<body>
-				<div id="editor-container">
+				<div id="root">
 					<div style="padding: 20px; color: var(--vscode-foreground); font-family: var(--vscode-editor-font-family);">
-						Initializing BlockNote editor...
+						Loading BlockNote editor...
 					</div>
 				</div>
 				<script nonce="${nonce}" src="${scriptUri}"></script>

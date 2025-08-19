@@ -1,0 +1,102 @@
+{
+  "name": "blocknote-markdown-editor",
+  "displayName": "BlockNote Markdown Editor",
+  "description": "A markdown editor and preview extension using BlockNote",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.103.0"
+  },
+  "categories": [
+    "Other",
+    "Notebooks",
+    "Programming Languages"
+  ],
+  "activationEvents": [],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "blocknote-markdown-editor.openPreview",
+        "title": "Open BlockNote Preview",
+        "icon": "$(preview)"
+      },
+      {
+        "command": "blocknote-markdown-editor.openEditor",
+        "title": "Edit with BlockNote",
+        "icon": "$(edit)"
+      }
+    ],
+    "menus": {
+      "explorer/context": [
+        {
+          "command": "blocknote-markdown-editor.openPreview",
+          "when": "resourceExtname == .md",
+          "group": "navigation"
+        },
+        {
+          "command": "blocknote-markdown-editor.openEditor",
+          "when": "resourceExtname == .md",
+          "group": "navigation"
+        }
+      ],
+      "editor/title": [
+        {
+          "command": "blocknote-markdown-editor.openPreview",
+          "when": "resourceExtname == .md",
+          "group": "navigation"
+        },
+        {
+          "command": "blocknote-markdown-editor.openEditor",
+          "when": "resourceExtname == .md",
+          "group": "navigation"
+        }
+      ]
+    },
+    "customEditors": [
+      {
+        "viewType": "blocknote-markdown-editor.editor",
+        "displayName": "BlockNote Editor",
+        "selector": [
+          {
+            "filenamePattern": "*.md"
+          }
+        ]
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run package",
+    "compile": "npm run check-types && npm run lint && node esbuild.js",
+    "watch": "npm-run-all -p watch:*",
+    "watch:esbuild": "node esbuild.js --watch",
+    "watch:tsc": "tsc --noEmit --watch --project tsconfig.json",
+    "package": "npm run check-types && npm run lint && node esbuild.js --production",
+    "compile-tests": "tsc -p . --outDir out",
+    "watch-tests": "tsc -p . -w --outDir out",
+    "pretest": "npm run compile-tests && npm run compile && npm run lint",
+    "check-types": "tsc --noEmit",
+    "lint": "eslint src",
+    "test": "vscode-test"
+  },
+  "devDependencies": {
+    "@types/mocha": "^10.0.10",
+    "@types/node": "20.x",
+    "@types/react": "^19.1.10",
+    "@types/react-dom": "^19.1.7",
+    "@types/vscode": "^1.103.0",
+    "@typescript-eslint/eslint-plugin": "^8.25.0",
+    "@typescript-eslint/parser": "^8.25.0",
+    "@vscode/test-cli": "^0.0.10",
+    "@vscode/test-electron": "^2.4.1",
+    "esbuild": "^0.25.0",
+    "eslint": "^9.21.0",
+    "npm-run-all": "^4.1.5",
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1",
+    "typescript": "^5.7.3"
+  },
+  "dependencies": {
+    "@blocknote/core": "^0.35.0",
+    "@blocknote/react": "^0.35.0"
+  }
+}

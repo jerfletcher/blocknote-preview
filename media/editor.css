@@ -1,0 +1,40 @@
+body {
+	background-color: var(--vscode-editor-background);
+	color: var(--vscode-editor-foreground);
+	font-family: var(--vscode-editor-font-family);
+	font-size: var(--vscode-editor-font-size);
+	font-weight: var(--vscode-editor-font-weight);
+	line-height: 1.4;
+	margin: 0;
+	padding: 20px;
+}
+
+#editor-container {
+	height: 100vh;
+	width: 100%;
+}
+
+.bn-container {
+	background-color: var(--vscode-editor-background) !important;
+	color: var(--vscode-editor-foreground) !important;
+	border: none !important;
+}
+
+.bn-editor {
+	background-color: var(--vscode-editor-background) !important;
+	color: var(--vscode-editor-foreground) !important;
+}
+
+/* BlockNote specific styling */
+.ProseMirror {
+	background-color: var(--vscode-editor-background) !important;
+	color: var(--vscode-editor-foreground) !important;
+	border: none !important;
+	outline: none !important;
+}
+
+/* Toolbar styling */
+.bn-toolbar {
+	background-color: var(--vscode-toolbar-background) !important;
+	border-color: var(--vscode-toolbar-border) !important;
+}

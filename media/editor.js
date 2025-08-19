@@ -1,6 +1,7 @@
 // @ts-check
 
 // Get access to the VS Code API from within the webview context
+// @ts-ignore
 const vscode = acquireVsCodeApi();
 
 // BlockNote editor integration
@@ -40,11 +41,12 @@ const vscode = acquireVsCodeApi();
         
         const editor = document.createElement('textarea');
         editor.style.cssText = `
-            width: 100%;
-            height: 100vh;
+            width: calc(100% - 32px);
+            height: calc(100vh - 80px);
             border: 1px solid var(--vscode-input-border);
             border-radius: 6px;
             padding: 16px;
+            margin: 20px;
             font-family: var(--vscode-editor-font-family);
             font-size: 14px;
             line-height: 1.6;
@@ -125,15 +127,20 @@ const vscode = acquireVsCodeApi();
     while (attempts < maxAttempts) {
         if (window.React && 
             window.ReactDOM && 
+            // @ts-ignore
             window.BlockNote && 
+            // @ts-ignore
             window.BlockNoteReact &&
+            // @ts-ignore
             window.BlockNoteEditor) {
             console.log('All BlockNote dependencies and component are ready');
             break;
         }
         
+        // @ts-ignore
         if (window.BlockNotePromise) {
             console.log('Waiting for BlockNote promise to resolve...');
+            // @ts-ignore
             await window.BlockNotePromise;
             // Wait a bit more for the component to load
             await new Promise(resolve => setTimeout(resolve, 500));
@@ -143,6 +150,7 @@ const vscode = acquireVsCodeApi();
         attempts++;
     }
     
+    // @ts-ignore
     if (attempts >= maxAttempts || !window.BlockNoteEditor) {
         throw new Error('BlockNote dependencies not available after waiting');
     }
@@ -159,11 +167,18 @@ const vscode = acquireVsCodeApi();
     const rootElement = document.getElementById('blocknote-root');
     let renderFunction;
     
-    if (ReactDOM.createRoot) {
-        const root = ReactDOM.createRoot(rootElement);
+    // @ts-ignore - ReactDOM may have createRoot in newer versions
+    if (window.ReactDOM && window.ReactDOM.createRoot) {
+        // @ts-ignore
+        const root = window.ReactDOM.createRoot(rootElement);
         renderFunction = (element) => root.render(element);
+    } else if (window.ReactDOM && window.ReactDOM.render) {
+        // @ts-ignore
+        renderFunction = (element) => root.render(element);
+    // @ts-ignore
+    } else if (window.ReactDOM && window.ReactDOM.render) {
     } else {
-        renderFunction = (element) => ReactDOM.render(element, rootElement);
+        throw new Error('ReactDOM not available for rendering');
     }
     
     function onContentChange(markdown) {
@@ -176,17 +191,25 @@ const vscode = acquireVsCodeApi();
     }
     
     function updateContent(text) {
-        renderFunction(React.createElement(window.BlockNoteEditor, {
-            initialContent: text,
-            onContentChange: onContentChange
-        }));
+        // @ts-ignore
+        if (window.React && window.BlockNoteEditor) {
+            // @ts-ignore
+            renderFunction(window.React.createElement(window.BlockNoteEditor, {
+                initialContent: text,
+                onContentChange: onContentChange
+            }));
+        }
     }
     
     // Initial render
-    renderFunction(React.createElement(window.BlockNoteEditor, {
-        initialContent: '',
-        onContentChange: onContentChange
-    }));
+    // @ts-ignore
+    if (window.React && window.BlockNoteEditor) {
+        // @ts-ignore
+        renderFunction(window.React.createElement(window.BlockNoteEditor, {
+            initialContent: '',
+            onContentChange: onContentChange
+        }));
+    }
     
     console.log('BlockNote editor initialized successfully');
     return { updateContent };

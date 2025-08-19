@@ -53,6 +53,8 @@ const BlockNoteEditorComponent: React.FC<BlockNoteEditorComponentProps> = ({
         ...defaultBlockSpecs,
       },
     }),
+    // Enable file upload (can be undefined to disable)
+    uploadFile: undefined,
   });
 
   // Update theme when VS Code theme changes
@@ -113,6 +115,9 @@ const BlockNoteEditorComponent: React.FC<BlockNoteEditorComponentProps> = ({
       <BlockNoteView 
         editor={editor}
         theme={theme}
+        slashMenu={true}
+        formattingToolbar={true}
+        sideMenu={true}
         data-theming-css-variables-demo
       />
     </div>

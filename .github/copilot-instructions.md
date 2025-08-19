@@ -31,6 +31,7 @@ This is a VS Code extension project that provides an enhanced markdown editing a
 2. Press **F5** to launch the extension in a new VS Code window for testing
 3. Open any `.md` file and use the context menu to "Edit with BlockNote"
 4. The build system is running in watch mode to automatically rebuild on changes
+5. Use `npm run vsix:install` to build and install the extension (auto-increments version)
 
 ## Current State
 

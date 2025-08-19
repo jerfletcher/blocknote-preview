@@ -2,7 +2,8 @@
   "name": "blocknote-markdown-editor",
   "displayName": "BlockNote Markdown Editor",
   "description": "A markdown editor and preview extension using BlockNote",
-  "version": "0.0.14",
+  "version": "0.0.19",
+  "publisher": "jeremy-fletcher",
   "repository": {
     "type": "git",
     "url": "https://github.com/jerfletcher/blocknote-preview.git"
@@ -12,7 +13,7 @@
     "url": "https://github.com/jerfletcher/blocknote-preview/issues"
   },
   "engines": {
-    "vscode": "^1.103.0"
+    "vscode": ">=1.100.0"
   },
   "categories": [
     "Other",
@@ -67,8 +68,15 @@
     "watch:esbuild": "node esbuild.js --watch",
     "watch:tsc": "tsc --noEmit --watch --project tsconfig.json",
     "package": "npm run lint && node esbuild.js --production",
-    "package:vsix": "npm run package && vsce package",
-    "install:vsix": "npm run package:vsix && code --install-extension *.vsix",
+    "vsix:package": "npm run clean:vsix && npm version patch --no-git-tag-version && npm run package && vsce package",
+    "vsix:install": "npm run vsix:package && code-insiders --install-extension *.vsix",
+    "vsix:install:stable": "npm run vsix:package && code --install-extension *.vsix",
+    "vsix:install:insiders": "npm run vsix:package && code-insiders --install-extension *.vsix",
+    "vsix:install:auto": "npm run vsix:package && (code-insiders --install-extension *.vsix 2>/dev/null || code --install-extension *.vsix)",
+    "version:patch": "npm version patch --no-git-tag-version",
+    "version:minor": "npm version minor --no-git-tag-version",
+    "version:major": "npm version major --no-git-tag-version",
+    "clean:vsix": "rm -f *.vsix",
     "compile-tests": "tsc -p . --outDir out",
     "watch-tests": "tsc -p . -w --outDir out",
     "pretest": "npm run compile-tests && npm run compile && npm run lint",
@@ -84,7 +92,7 @@
     "@types/node": "20.x",
     "@types/react": "^19.1.10",
     "@types/react-dom": "^19.1.7",
-    "@types/vscode": "^1.103.0",
+    "@types/vscode": "^1.100.0",
     "@typescript-eslint/eslint-plugin": "^8.25.0",
     "@typescript-eslint/parser": "^8.25.0",
     "@vscode/test-cli": "^0.0.10",

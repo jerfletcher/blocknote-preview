@@ -29,7 +29,7 @@ cd blocknote-preview
 npm install
 
 # Build and install the extension
-npm run install:vsix
+npm run vsix:install
 ```
 
 ## Development
@@ -79,12 +79,28 @@ This will start both TypeScript type checking and esbuild in watch mode, automat
 
 #### Package as VSIX
 ```bash
-# Create a .vsix package file
-npm run package:vsix
+# Create a .vsix package file (auto-increments version)
+npm run vsix:package
 
-# Build and install the extension in VS Code
-npm run install:vsix
+# Build and install in VS Code Insiders (auto-increments version)
+npm run vsix:install
+
+# Build and install in VS Code Stable
+npm run vsix:install:stable
+
+# Build and install in VS Code Insiders (explicit)
+npm run vsix:install:insiders
+
+# Auto-detect VS Code version and install
+npm run vsix:install:auto
+
+# Manual version control
+npm run version:patch   # 0.0.x
+npm run version:minor   # 0.x.0  
+npm run version:major   # x.0.0
 ```
+
+**Note**: The default `vsix:install` command is configured for VS Code Insiders. All install commands automatically increment the patch version to ensure VS Code picks up changes.
 
 ### Available NPM Scripts
 
@@ -96,8 +112,12 @@ npm run install:vsix
 | `npm run dev` | Start development with watch mode |
 | `npm run watch` | Watch for changes and rebuild |
 | `npm run package` | Create production bundle |
-| `npm run package:vsix` | Package as VSIX extension |
-| `npm run install:vsix` | Build and install extension in VS Code |
+| `npm run vsix:package` | Auto-increment version and package as VSIX |
+| `npm run vsix:install` | Auto-increment, build and install extension in VS Code |
+| `npm run version:patch` | Manually increment patch version (0.0.x) |
+| `npm run version:minor` | Manually increment minor version (0.x.0) |
+| `npm run version:major` | Manually increment major version (x.0.0) |
+| `npm run clean:vsix` | Remove all VSIX files |
 | `npm run lint` | Run ESLint |
 | `npm run lint:fix` | Run ESLint and fix auto-fixable issues |
 | `npm run check-types` | Type check without building |
@@ -109,7 +129,8 @@ npm run install:vsix
 1. **Start Development**: `npm run dev` - This starts watch mode
 2. **Launch Extension**: Press `F5` in VS Code to open Extension Development Host
 3. **Test Changes**: Open any `.md` file and use "Open with BlockNote" from context menu
-4. **Package**: `npm run package:vsix` when ready to create installable extension
+4. **Package**: `npm run vsix:package` automatically increments version and creates installable extension
+5. **Install**: `npm run vsix:install` builds with new version and installs in VS Code
 
 ### Project Structure
 

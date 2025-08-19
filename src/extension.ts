@@ -9,32 +9,30 @@ export function activate(context: vscode.ExtensionContext) {
 
 	// Use the console to output diagnostic information (console.log) and errors (console.error)
 	// This line of code will only be executed once when your extension is activated
-	console.log('Congratulations, your extension "blocknote-markdown-editor" is now active!');
+	console.log('✅ BlockNote extension is now active!');
 
 	// Register the custom editor provider
 	const provider = new BlockNoteEditorProvider(context);
 	context.subscriptions.push(
 		vscode.window.registerCustomEditorProvider(BlockNoteEditorProvider.viewType, provider)
 	);
+	console.log('📝 Custom editor provider registered');
 
 	// Register commands
 	context.subscriptions.push(
-		vscode.commands.registerCommand('blocknote-markdown-editor.openPreview', (uri?: vscode.Uri) => {
-			const targetUri = uri || vscode.window.activeTextEditor?.document.uri;
-			if (targetUri) {
-				vscode.commands.executeCommand('vscode.openWith', targetUri, BlockNoteEditorProvider.viewType);
-			}
-		})
-	);
-
-	context.subscriptions.push(
 		vscode.commands.registerCommand('blocknote-markdown-editor.openEditor', (uri?: vscode.Uri) => {
+			console.log('🎯 BlockNote command triggered', uri?.fsPath || 'no URI');
 			const targetUri = uri || vscode.window.activeTextEditor?.document.uri;
 			if (targetUri) {
+				console.log('🚀 Opening file with BlockNote:', targetUri.fsPath);
 				vscode.commands.executeCommand('vscode.openWith', targetUri, BlockNoteEditorProvider.viewType);
+			} else {
+				console.error('❌ No file URI available');
+				vscode.window.showErrorMessage('No file selected to open with BlockNote');
 			}
 		})
 	);
+	console.log('🔧 Commands registered');
 }
 
 // This method is called when your extension is deactivated

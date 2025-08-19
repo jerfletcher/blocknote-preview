@@ -2,7 +2,7 @@
   "name": "blocknote-markdown-editor",
   "displayName": "BlockNote Markdown Editor",
   "description": "A markdown editor and preview extension using BlockNote",
-  "version": "0.0.1",
+  "version": "0.0.7",
   "engines": {
     "vscode": "^1.103.0"
   },
@@ -16,23 +16,13 @@
   "contributes": {
     "commands": [
       {
-        "command": "blocknote-markdown-editor.openPreview",
-        "title": "Open BlockNote Preview",
-        "icon": "$(preview)"
-      },
-      {
         "command": "blocknote-markdown-editor.openEditor",
-        "title": "Edit with BlockNote",
+        "title": "Open with BlockNote",
         "icon": "$(edit)"
       }
     ],
     "menus": {
       "explorer/context": [
-        {
-          "command": "blocknote-markdown-editor.openPreview",
-          "when": "resourceExtname == .md",
-          "group": "navigation"
-        },
         {
           "command": "blocknote-markdown-editor.openEditor",
           "when": "resourceExtname == .md",
@@ -40,11 +30,6 @@
         }
       ],
       "editor/title": [
-        {
-          "command": "blocknote-markdown-editor.openPreview",
-          "when": "resourceExtname == .md",
-          "group": "navigation"
-        },
         {
           "command": "blocknote-markdown-editor.openEditor",
           "when": "resourceExtname == .md",
@@ -97,6 +82,7 @@
   },
   "dependencies": {
     "@blocknote/core": "^0.35.0",
+    "@blocknote/mantine": "^0.35.0",
     "@blocknote/react": "^0.35.0"
   }
 }

@@ -2,7 +2,7 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom/client';
 import { BlockNoteView } from '@blocknote/mantine';
 import { useCreateBlockNote } from '@blocknote/react';
-import { BlockNoteEditor, BlockNoteSchema, defaultBlockSpecs, filterSuggestionItems } from '@blocknote/core';
+import { BlockNoteEditor, BlockNoteSchema, defaultBlockSpecs } from '@blocknote/core';
 import '@blocknote/core/fonts/inter.css';
 import '@blocknote/mantine/style.css';
 
@@ -46,6 +46,9 @@ const BlockNoteEditorComponent: React.FC<BlockNoteEditorComponentProps> = ({
   onContentChange 
 }) => {
   const [theme, setTheme] = React.useState<'light' | 'dark'>(() => getVSCodeTheme());
+  const isUpdatingFromVSCode = React.useRef(false);
+  const initialContentRef = React.useRef<string>('');
+  const hasInitializedContent = React.useRef(false);
   
   const editor: BlockNoteEditor = useCreateBlockNote({
     schema: BlockNoteSchema.create({
@@ -55,6 +58,14 @@ const BlockNoteEditorComponent: React.FC<BlockNoteEditorComponentProps> = ({
     }),
     // Enable file upload (can be undefined to disable)
     uploadFile: undefined,
+    // Configure better slash menu behavior
+    domAttributes: {
+      editor: {
+        class: "bn-prosemirror-editor",
+        "data-test": "editor",
+        "data-editor-ready": "true"
+      }
+    }
   });
 
   // Update theme when VS Code theme changes
@@ -82,28 +93,71 @@ const BlockNoteEditorComponent: React.FC<BlockNoteEditorComponentProps> = ({
 
   // Handle content changes
   React.useEffect(() => {
+    let lastSavedContent = initialContentRef.current;
+    
     const handleChange = async () => {
-      if (onContentChange) {
-        const markdown = await editor.blocksToMarkdownLossy(editor.document);
-        onContentChange(markdown);
+      // Don't save changes if we're currently updating from VS Code or haven't initialized yet
+      if (onContentChange && !isUpdatingFromVSCode.current && hasInitializedContent.current) {
+        try {
+          const markdown = await editor.blocksToMarkdownLossy(editor.document);
+          
+          // Normalize content for comparison (trim whitespace, normalize line endings)
+          const normalizedMarkdown = markdown.replace(/\r\n/g, '\n').trim();
+          const normalizedLastSaved = lastSavedContent.replace(/\r\n/g, '\n').trim();
+          
+          // Only save if content has actually changed to prevent sync loops
+          if (normalizedMarkdown !== normalizedLastSaved) {
+            console.log('Content actually changed, saving...');
+            lastSavedContent = markdown;
+            onContentChange(markdown);
+          }
+        } catch (error) {
+          console.error('Error converting blocks to markdown:', error);
+        }
       }
     };
 
-    editor.onChange(handleChange);
+    // Use a longer debounce to prevent rapid saves during typing
+    let timeoutId: NodeJS.Timeout;
+    const debouncedHandleChange = () => {
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(handleChange, 500); // Increased to 500ms
+    };
+
+    const unsubscribe = editor.onChange(debouncedHandleChange);
     return () => {
-      // Cleanup if needed
+      clearTimeout(timeoutId);
+      unsubscribe?.();
     };
   }, [editor, onContentChange]);
 
   // Handle initial content
   React.useEffect(() => {
-    if (initialContent) {
+    if (initialContent && !hasInitializedContent.current) {
       const updateContent = async () => {
+        // Set flag to prevent saving during VS Code updates
+        isUpdatingFromVSCode.current = true;
+        initialContentRef.current = initialContent;
+        
         try {
-          const blocks = await editor.tryParseMarkdownToBlocks(initialContent);
-          editor.replaceBlocks(editor.document, blocks);
+          // Get current content to compare
+          const currentMarkdown = await editor.blocksToMarkdownLossy(editor.document);
+          
+          // Only update if content has actually changed to prevent cursor jumping
+          if (currentMarkdown.trim() !== initialContent.trim()) {
+            console.log('Content differs, updating editor. Current:', currentMarkdown.length, 'New:', initialContent.length);
+            
+            const blocks = await editor.tryParseMarkdownToBlocks(initialContent);
+            editor.replaceBlocks(editor.document, blocks);
+          }
         } catch (error) {
-          console.warn('Failed to parse initial markdown content:', error);
+          console.warn('Failed to parse or update markdown content:', error);
+        } finally {
+          // Reset flag after update is complete and mark as initialized
+          setTimeout(() => {
+            isUpdatingFromVSCode.current = false;
+            hasInitializedContent.current = true;
+          }, 500); // Longer delay to ensure everything is settled
         }
       };
       updateContent();
@@ -119,6 +173,10 @@ const BlockNoteEditorComponent: React.FC<BlockNoteEditorComponentProps> = ({
         formattingToolbar={true}
         sideMenu={true}
         data-theming-css-variables-demo
+        // Prevent cursor jumping during slash menu interactions
+        onSelectionChange={() => {
+          // Don't trigger rapid updates during selection changes
+        }}
       />
     </div>
   );
@@ -176,11 +234,10 @@ const App: React.FC = () => {
 
   return (
     <div style={{ 
-      height: '100vh', 
+      minHeight: '100vh', 
       width: '100%',
       backgroundColor: 'var(--vscode-editor-background)',
-      color: 'var(--vscode-editor-foreground)',
-      overflow: 'hidden'
+      color: 'var(--vscode-editor-foreground)'
     }}>
       <BlockNoteEditorComponent 
         initialContent={content}

@@ -1,9 +1,10 @@
 {
   "name": "blocknote-markdown-editor",
   "displayName": "BlockNote Markdown Editor",
-  "description": "A markdown editor and preview extension using BlockNote",
-  "version": "0.0.19",
+  "description": "Enhanced markdown editing and preview using BlockNote editor",
+  "version": "0.0.32",
   "publisher": "jeremy-fletcher",
+  "icon": "media/blocknote-icon.png",
   "repository": {
     "type": "git",
     "url": "https://github.com/jerfletcher/blocknote-preview.git"
@@ -28,6 +29,21 @@
         "command": "blocknote-markdown-editor.openEditor",
         "title": "Open with BlockNote",
         "icon": "$(edit)"
+      },
+      {
+        "command": "blocknote-markdown-editor.newFile",
+        "title": "New BlockNote Markdown File",
+        "icon": "$(new-file)"
+      },
+      {
+        "command": "blocknote-markdown-editor.openWithDefault",
+        "title": "Open with Default Markdown Editor",
+        "icon": "$(go-to-file)"
+      },
+      {
+        "command": "blocknote-markdown-editor.toggleEditor",
+        "title": "Toggle BlockNote/Default Editor",
+        "icon": "$(arrow-swap)"
       }
     ],
     "menus": {
@@ -54,7 +70,21 @@
           {
             "filenamePattern": "*.md"
           }
-        ]
+        ],
+        "priority": "option"
+      }
+    ],
+    "keybindings": [
+      {
+        "command": "blocknote-markdown-editor.newFile",
+        "key": "ctrl+alt+n",
+        "mac": "cmd+alt+n"
+      },
+      {
+        "command": "blocknote-markdown-editor.toggleEditor",
+        "key": "ctrl+shift+b",
+        "mac": "cmd+shift+b",
+        "when": "resourceExtname == .md"
       }
     ]
   },
@@ -69,7 +99,13 @@
     "watch:tsc": "tsc --noEmit --watch --project tsconfig.json",
     "package": "npm run lint && node esbuild.js --production",
     "vsix:package": "npm run clean:vsix && npm version patch --no-git-tag-version && npm run package && vsce package",
-    "vsix:install": "npm run vsix:package && code-insiders --install-extension *.vsix",
+    "vsix:package:patch": "npm run clean:vsix && npm version patch --no-git-tag-version && npm run package && vsce package",
+    "vsix:package:minor": "npm run clean:vsix && npm version minor --no-git-tag-version && npm run package && vsce package",
+    "vsix:package:major": "npm run clean:vsix && npm version major --no-git-tag-version && npm run package && vsce package",
+    "vsix:install": "npm run vsix:package:patch && code-insiders --install-extension *.vsix",
+    "vsix:install:patch": "npm run vsix:package:patch && code-insiders --install-extension *.vsix",
+    "vsix:install:minor": "npm run vsix:package:minor && code-insiders --install-extension *.vsix",
+    "vsix:install:major": "npm run vsix:package:major && code-insiders --install-extension *.vsix",
     "vsix:install:stable": "npm run vsix:package && code --install-extension *.vsix",
     "vsix:install:insiders": "npm run vsix:package && code-insiders --install-extension *.vsix",
     "vsix:install:auto": "npm run vsix:package && (code-insiders --install-extension *.vsix 2>/dev/null || code --install-extension *.vsix)",
@@ -107,6 +143,7 @@
   "dependencies": {
     "@blocknote/core": "^0.35.0",
     "@blocknote/mantine": "^0.35.0",
-    "@blocknote/react": "^0.35.0"
+    "@blocknote/react": "^0.35.0",
+    "sharp": "^0.34.3"
   }
 }

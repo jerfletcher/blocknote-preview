@@ -79,11 +79,21 @@ This will start both TypeScript type checking and esbuild in watch mode, automat
 
 #### Package as VSIX
 ```bash
-# Create a .vsix package file (auto-increments version)
+# Create a .vsix package file (auto-increments patch version)
 npm run vsix:package
 
-# Build and install in VS Code Insiders (auto-increments version)
+# Version-specific packaging
+npm run vsix:package:patch  # 0.0.x
+npm run vsix:package:minor  # 0.x.0
+npm run vsix:package:major  # x.0.0
+
+# Build and install in VS Code Insiders (auto-increments patch version)
 npm run vsix:install
+
+# Version-specific install commands
+npm run vsix:install:patch  # Increment patch (0.0.x) and install
+npm run vsix:install:minor  # Increment minor (0.x.0) and install  
+npm run vsix:install:major  # Increment major (x.0.0) and install
 
 # Build and install in VS Code Stable
 npm run vsix:install:stable
@@ -94,10 +104,22 @@ npm run vsix:install:insiders
 # Auto-detect VS Code version and install
 npm run vsix:install:auto
 
-# Manual version control
+# Manual version control (without packaging)
 npm run version:patch   # 0.0.x
 npm run version:minor   # 0.x.0  
 npm run version:major   # x.0.0
+```
+
+**Examples:**
+```bash
+# Install with minor version bump (0.0.31 → 0.1.0)
+npm run vsix:install:minor
+
+# Install with major version bump (0.1.0 → 1.0.0)  
+npm run vsix:install:major
+
+# Default install (patch bump: 1.0.0 → 1.0.1)
+npm run vsix:install
 ```
 
 **Note**: The default `vsix:install` command is configured for VS Code Insiders. All install commands automatically increment the patch version to ensure VS Code picks up changes.
@@ -112,8 +134,14 @@ npm run version:major   # x.0.0
 | `npm run dev` | Start development with watch mode |
 | `npm run watch` | Watch for changes and rebuild |
 | `npm run package` | Create production bundle |
-| `npm run vsix:package` | Auto-increment version and package as VSIX |
-| `npm run vsix:install` | Auto-increment, build and install extension in VS Code |
+| `npm run vsix:package` | Auto-increment patch version and package as VSIX |
+| `npm run vsix:package:patch` | Increment patch (0.0.x) and package as VSIX |
+| `npm run vsix:package:minor` | Increment minor (0.x.0) and package as VSIX |
+| `npm run vsix:package:major` | Increment major (x.0.0) and package as VSIX |
+| `npm run vsix:install` | Auto-increment patch, build and install extension |
+| `npm run vsix:install:patch` | Increment patch, build and install |
+| `npm run vsix:install:minor` | Increment minor, build and install |
+| `npm run vsix:install:major` | Increment major, build and install |
 | `npm run version:patch` | Manually increment patch version (0.0.x) |
 | `npm run version:minor` | Manually increment minor version (0.x.0) |
 | `npm run version:major` | Manually increment major version (x.0.0) |

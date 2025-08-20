@@ -21,6 +21,9 @@ export class BlockNoteEditorProvider implements vscode.CustomTextEditorProvider 
 		console.log('🎨 Resolving custom text editor for:', document.fileName);
 		console.log('📄 Document content length:', document.getText().length);
 		
+		// Set custom icon for the webview panel (tab icon)
+		webviewPanel.iconPath = vscode.Uri.joinPath(this.context.extensionUri, 'media', 'blocknote-tab-icon.png');
+		
 		// Setup initial content for the webview
 		webviewPanel.webview.options = {
 			enableScripts: true,
@@ -29,7 +32,14 @@ export class BlockNoteEditorProvider implements vscode.CustomTextEditorProvider 
 		webviewPanel.webview.html = this.getHtmlForWebview(webviewPanel.webview, document);
 		console.log('🌐 Webview HTML set');
 
+		// Flag to prevent sync feedback loop
+		let isUpdatingFromWebview = false;
+
 		function updateWebview() {
+			if (isUpdatingFromWebview) {
+				console.log('🔄 Skipping webview update (currently updating from webview)');
+				return;
+			}
 			console.log('📤 Updating webview with content length:', document.getText().length);
 			webviewPanel.webview.postMessage({
 				type: 'update',
@@ -52,12 +62,22 @@ export class BlockNoteEditorProvider implements vscode.CustomTextEditorProvider 
 		});
 
 		// Receive message from the webview
-		webviewPanel.webview.onDidReceiveMessage(e => {
+		webviewPanel.webview.onDidReceiveMessage(async e => {
 			console.log('📨 Received message from webview:', e.type, 'data length:', e.text?.length || 0);
 			switch (e.type) {
 				case 'save':
 					console.log('💾 Saving content, length:', e.text?.length || 0);
-					this.updateTextDocument(document, e.text);
+					isUpdatingFromWebview = true;
+					try {
+						await this.updateTextDocument(document, e.text);
+						// Reset flag after a short delay to allow VS Code to process the change
+						setTimeout(() => {
+							isUpdatingFromWebview = false;
+						}, 100);
+					} catch (error) {
+						console.error('Error updating document:', error);
+						isUpdatingFromWebview = false;
+					}
 					return;
 				case 'ready':
 					console.log('✅ Webview is ready, sending initial content');
@@ -102,16 +122,18 @@ export class BlockNoteEditorProvider implements vscode.CustomTextEditorProvider 
 					/* Ensure proper styling for BlockNote */
 					body {
 						margin: 0;
-						padding: 0;
+						padding: 16px;
 						height: 100vh;
-						overflow: hidden;
+						overflow-y: auto;
+						overflow-x: hidden;
+						box-sizing: border-box;
 						background: var(--vscode-editor-background);
 						color: var(--vscode-editor-foreground);
 					}
 					
 					#root {
-						height: 100vh;
-						width: 100%;
+						min-height: calc(100vh - 32px);
+						width: calc(100% - 32px);
 					}
 					
 					/* BlockNote custom styling for VS Code integration */

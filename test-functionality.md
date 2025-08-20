@@ -1,8 +1,18 @@
-# Test BlockNote Editor
+# Test BlockNote Editor ok this si a change
+
+## thi is pretty awsome
 
 This is a test markdown file to verify that the BlockNote editor is working correctly with:
 
 * **Slash commands** (type `/` to see the menu)
+
+* ok this is a thing
+
+* id id d i d it work
+
+* ok awesome
+
+*
 
 * **Right-click context menu**
 
@@ -10,7 +20,7 @@ This is a test markdown file to verify that the BlockNote editor is working corr
 
 * **Formatting toolbar** (select text to see it)
 
-## Features to Test
+## Features to Test/
 
 1. Type `/` and see if the slash menu appears
 
@@ -24,11 +34,14 @@ This is a test markdown file to verify that the BlockNote editor is working corr
 
 ```javascript
 console.log("Hello, BlockNote!");
+this is a thing
 ```
 
 ### Quote Test
 
 > This is a blockquote to test styling
+
+###
 
 ### List Test
 
@@ -40,9 +53,7 @@ console.log("Hello, BlockNote!");
 
   * Another nested item
 
-### Table Test
-
-| Column 1 | Column 2 | Column 3 |
-| -------- | -------- | -------- |
-| Cell 1   | Cell 2   | Cell 3   |
-| Cell 4   | Cell 5   | Cell 6   |
+| Column 1 | Column 2 | Column 3  |   |
+| -------- | -------- | --------- | - |
+| Cell 1   | Cell 2   | Cell 3    |   |
+| Cell 4   | Cell 5   | Cell 6thi |   |

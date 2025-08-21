@@ -2,7 +2,7 @@
   "name": "blocknote-markdown-editor",
   "displayName": "BlockNote Markdown Editor",
   "description": "Enhanced markdown editing and preview using BlockNote editor",
-  "version": "0.0.32",
+  "version": "0.0.71",
   "publisher": "jeremy-fletcher",
   "icon": "media/blocknote-icon.png",
   "repository": {
@@ -44,6 +44,16 @@
         "command": "blocknote-markdown-editor.toggleEditor",
         "title": "Toggle BlockNote/Default Editor",
         "icon": "$(arrow-swap)"
+      },
+      {
+        "command": "blocknote-markdown-editor.compareFiles",
+        "title": "Compare Files with Default Editor",
+        "icon": "$(diff)"
+      },
+      {
+        "command": "blocknote-markdown-editor.toggleViewMode",
+        "title": "Toggle Rich/Text View Mode",
+        "icon": "$(eye)"
       }
     ],
     "menus": {
@@ -52,12 +62,27 @@
           "command": "blocknote-markdown-editor.openEditor",
           "when": "resourceExtname == .md",
           "group": "navigation"
+        },
+        {
+          "command": "blocknote-markdown-editor.compareFiles",
+          "when": "resourceExtname == .md && !explorerResourceIsFolder",
+          "group": "7_modification"
         }
       ],
       "editor/title": [
         {
           "command": "blocknote-markdown-editor.openEditor",
           "when": "resourceExtname == .md",
+          "group": "navigation"
+        },
+        {
+          "command": "blocknote-markdown-editor.compareFiles",
+          "when": "resourceExtname == .md",
+          "group": "1_diff"
+        },
+        {
+          "command": "blocknote-markdown-editor.toggleViewMode",
+          "when": "activeCustomEditorId == blocknote-markdown-editor.editor",
           "group": "navigation"
         }
       ]
@@ -71,9 +96,39 @@
             "filenamePattern": "*.md"
           }
         ],
-        "priority": "option"
+        "priority": "option",
+        "supportsMultipleEditorsPerDocument": true
       }
     ],
+    "configuration": {
+      "title": "BlockNote Markdown Editor",
+      "properties": {
+        "blocknote-markdown-editor.useDiffForComparison": {
+          "type": "boolean",
+          "default": true,
+          "description": "Use default text diff view when comparing markdown files instead of BlockNote editor. When enabled, file comparisons will use VS Code's built-in diff functionality."
+        },
+        "blocknote-markdown-editor.autoOpenBlockNote": {
+          "type": "boolean",
+          "default": false,
+          "description": "Automatically open markdown files with BlockNote editor by default instead of the default text editor."
+        },
+        "blocknote-markdown-editor.enableDefaultForDiff": {
+          "type": "boolean",
+          "default": true,
+          "description": "Automatically fall back to default text editor when VS Code tries to show diffs. This ensures proper diff highlighting works."
+        },
+        "blocknote-markdown-editor.defaultViewMode": {
+          "type": "string",
+          "enum": [
+            "rich",
+            "text"
+          ],
+          "default": "rich",
+          "description": "Default view mode when opening files: 'rich' for visual editor, 'text' for plain markdown text."
+        }
+      }
+    },
     "keybindings": [
       {
         "command": "blocknote-markdown-editor.newFile",
@@ -85,6 +140,12 @@
         "key": "ctrl+shift+b",
         "mac": "cmd+shift+b",
         "when": "resourceExtname == .md"
+      },
+      {
+        "command": "blocknote-markdown-editor.toggleViewMode",
+        "key": "ctrl+shift+v",
+        "mac": "cmd+shift+v",
+        "when": "activeCustomEditorId == blocknote-markdown-editor.editor"
       }
     ]
   },
@@ -144,6 +205,12 @@
     "@blocknote/core": "^0.35.0",
     "@blocknote/mantine": "^0.35.0",
     "@blocknote/react": "^0.35.0",
+    "@codemirror/lang-markdown": "^6.3.4",
+    "@codemirror/language": "^6.11.3",
+    "@codemirror/theme-one-dark": "^6.1.3",
+    "@codemirror/view": "^6.38.1",
+    "@lezer/highlight": "^1.2.1",
+    "codemirror": "^6.0.2",
     "sharp": "^0.34.3"
   }
 }

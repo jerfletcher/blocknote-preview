@@ -16,10 +16,31 @@ export class BlockNoteEditorProvider implements vscode.CustomTextEditorProvider 
 	public async resolveCustomTextEditor(
 		document: vscode.TextDocument,
 		webviewPanel: vscode.WebviewPanel,
-		_token: vscode.CancellationToken
+		token: vscode.CancellationToken
 	): Promise<void> {
+		//TODO desnt work, diff editor still opens custom editor
 		console.log('🎨 Resolving custom text editor for:', document.fileName);
 		console.log('📄 Document content length:', document.getText().length);
+		
+		// Check if this is being opened for diff comparison
+		const activeTabGroup = vscode.window.tabGroups.activeTabGroup;
+		const isDiffContext = activeTabGroup.tabs.some(tab => 
+			tab.input instanceof vscode.TabInputTextDiff
+		);
+		
+		if (isDiffContext) {
+			console.log('🔍 Detected diff context - delegating to default text editor');
+			// For diff comparisons, we should use the default text editor
+			const config = vscode.workspace.getConfiguration('blocknote-markdown-editor');
+			const useDiffForComparison = config.get<boolean>('useDiffForComparison', true);
+			
+			if (useDiffForComparison) {
+				// Close this custom editor and open with default
+				webviewPanel.dispose();
+				await vscode.commands.executeCommand('vscode.openWith', document.uri, 'default');
+				return;
+			}
+		}
 		
 		// Set custom icon for the webview panel (tab icon)
 		webviewPanel.iconPath = vscode.Uri.joinPath(this.context.extensionUri, 'media', 'blocknote-tab-icon.png');
@@ -99,11 +120,13 @@ export class BlockNoteEditorProvider implements vscode.CustomTextEditorProvider 
 		const styleResetPath = vscode.Uri.joinPath(this.context.extensionUri, 'media', 'reset.css');
 		const styleMainPath = vscode.Uri.joinPath(this.context.extensionUri, 'media', 'editor.css');
 		const styleWebviewPath = vscode.Uri.joinPath(this.context.extensionUri, 'media', 'webview.css');
+		const styleCodeMirrorPath = vscode.Uri.joinPath(this.context.extensionUri, 'media', 'codemirror-styles.css');
 		
 		// Uri to load styles into webview
 		const stylesResetUri = webview.asWebviewUri(styleResetPath);
 		const stylesMainUri = webview.asWebviewUri(styleMainPath);
 		const stylesWebviewUri = webview.asWebviewUri(styleWebviewPath);
+		const stylesCodeMirrorUri = webview.asWebviewUri(styleCodeMirrorPath);
 
 		// Use a nonce to only allow specific scripts to be run
 		const nonce = getNonce();
@@ -118,6 +141,7 @@ export class BlockNoteEditorProvider implements vscode.CustomTextEditorProvider 
 				<link href="${stylesResetUri}" rel="stylesheet" />
 				<link href="${stylesMainUri}" rel="stylesheet" />
 				<link href="${stylesWebviewUri}" rel="stylesheet" />
+				<link href="${stylesCodeMirrorUri}" rel="stylesheet" />
 				<style>
 					/* Ensure proper styling for BlockNote */
 					body {

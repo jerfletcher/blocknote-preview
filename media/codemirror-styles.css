@@ -1,0 +1,142 @@
+/* CodeMirror Dark Mode Markdown Syntax Highlighting */
+.cm-theme-dark .cm-header {
+  color: #569cd6 !important;
+  font-weight: bold !important;
+}
+
+.cm-theme-dark .cm-header.cm-header-1 {
+  font-size: 1.6em !important;
+}
+
+.cm-theme-dark .cm-header.cm-header-2 {
+  font-size: 1.4em !important;
+}
+
+.cm-theme-dark .cm-header.cm-header-3 {
+  font-size: 1.2em !important;
+}
+
+.cm-theme-dark .cm-strong {
+  color: #d4d4d4 !important;
+  font-weight: bold !important;
+}
+
+.cm-theme-dark .cm-em {
+  color: #d4d4d4 !important;
+  font-style: italic !important;
+}
+
+.cm-theme-dark .cm-link {
+  color: #4fc1ff !important;
+  text-decoration: underline !important;
+}
+
+.cm-theme-dark .cm-url {
+  color: #4fc1ff !important;
+}
+
+.cm-theme-dark .cm-monospace {
+  color: #ce9178 !important;
+  background-color: rgba(255,255,255,0.1) !important;
+}
+
+.cm-theme-dark .cm-quote {
+  color: #6a9955 !important;
+  font-style: italic !important;
+}
+
+/* Hash symbols and asterisks - bright magenta */
+.cm-theme-dark .cm-contentSeparator,
+.cm-theme-dark .cm-punctuation,
+.cm-theme-dark .cm-processingInstruction {
+  color: #c586c0 !important;
+}
+
+/* CodeMirror Light Mode Markdown Syntax Highlighting */
+.cm-theme-light .cm-header {
+  color: #0000ff !important;
+  font-weight: bold !important;
+}
+
+.cm-theme-light .cm-header.cm-header-1 {
+  font-size: 1.6em !important;
+}
+
+.cm-theme-light .cm-header.cm-header-2 {
+  font-size: 1.4em !important;
+}
+
+.cm-theme-light .cm-header.cm-header-3 {
+  font-size: 1.2em !important;
+}
+
+.cm-theme-light .cm-strong {
+  color: #000000 !important;
+  font-weight: bold !important;
+}
+
+.cm-theme-light .cm-em {
+  color: #000000 !important;
+  font-style: italic !important;
+}
+
+.cm-theme-light .cm-link {
+  color: #0000ee !important;
+  text-decoration: underline !important;
+}
+
+.cm-theme-light .cm-url {
+  color: #0000ee !important;
+}
+
+.cm-theme-light .cm-monospace {
+  color: #a31515 !important;
+  background-color: rgba(0,0,0,0.04) !important;
+}
+
+.cm-theme-light .cm-quote {
+  color: #008000 !important;
+  font-style: italic !important;
+}
+
+/* Hash symbols and asterisks - magenta */
+.cm-theme-light .cm-contentSeparator,
+.cm-theme-light .cm-punctuation,
+.cm-theme-light .cm-processingInstruction {
+  color: #af00db !important;
+}
+
+/* CodeMirror container styling */
+.codemirror-container {
+  height: 100% !important;
+  width: 100% !important;
+  font-family: var(--vscode-editor-font-family) !important;
+  font-size: var(--vscode-editor-font-size) !important;
+  overflow: visible !important;
+}
+
+.codemirror-container .cm-editor {
+  height: auto !important;
+  min-height: calc(100vh - 32px) !important;
+  background-color: var(--vscode-editor-background) !important;
+  color: var(--vscode-editor-foreground) !important;
+  overflow: visible !important;
+}
+
+.codemirror-container .cm-scroller {
+  font-family: var(--vscode-editor-font-family) !important;
+  overflow: visible !important;
+  height: auto !important;
+}
+
+.codemirror-container .cm-content {
+  padding: 16px !important;
+  min-height: calc(100vh - 64px) !important;
+  font-family: var(--vscode-editor-font-family) !important;
+  font-size: var(--vscode-editor-font-size) !important;
+  overflow: visible !important;
+}
+
+.codemirror-container .cm-focused {
+  outline: none !important;
+}

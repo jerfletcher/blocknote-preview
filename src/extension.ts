@@ -94,6 +94,58 @@ export function activate(context: vscode.ExtensionContext) {
 			}
 		})
 	);
+
+	context.subscriptions.push(
+		//TODO doesnt work , still opens custom in diff
+		vscode.commands.registerCommand('blocknote-markdown-editor.compareFiles', async (uri?: vscode.Uri) => {
+			console.log('🔍 Starting file comparison with default diff view');
+			
+			if (!uri) {
+				vscode.window.showErrorMessage('No file selected for comparison');
+				return;
+			}
+
+			// Let user select the second file to compare with
+			const secondFile = await vscode.window.showOpenDialog({
+				canSelectFiles: true,
+				canSelectFolders: false,
+				canSelectMany: false,
+				filters: {
+					'Markdown files': ['md']
+				},
+				title: 'Select file to compare with'
+			});
+
+			if (secondFile && secondFile[0]) {
+				console.log('🚀 Opening diff view:', uri.fsPath, 'vs', secondFile[0].fsPath);
+				
+				// Force open both files with default text editor and then show diff
+				await vscode.commands.executeCommand('vscode.diff', uri, secondFile[0], 
+					`${uri.fsPath.split('/').pop()} ↔ ${secondFile[0].fsPath.split('/').pop()}`);
+			}
+		})
+	);
+
+	context.subscriptions.push(
+		vscode.commands.registerCommand('blocknote-markdown-editor.toggleViewMode', () => {
+			console.log('🔄 Toggling view mode');
+			
+			// Get the active editor
+			const activeEditor = vscode.window.activeTextEditor;
+			if (!activeEditor) {
+				const activeTab = vscode.window.tabGroups.activeTabGroup.activeTab;
+				if (activeTab?.input instanceof vscode.TabInputCustom && 
+					activeTab.input.viewType === BlockNoteEditorProvider.viewType) {
+					
+					// Send message to webview to toggle view mode
+					// We'll need to implement this in the provider
+					vscode.commands.executeCommand('workbench.action.webview.openDeveloperTools');
+					vscode.window.showInformationMessage('Use the toggle buttons in the editor to switch between Rich Editor and Markdown Text views');
+				}
+				return;
+			}
+		})
+	);
 	console.log('🔧 Commands registered');
 }
 

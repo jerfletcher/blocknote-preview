@@ -8,13 +8,13 @@ This is a test markdown file to verify that the BlockNote editor is working corr
 
 * ok this is a thing
 
-* id id d i d it work
+* id id d i d it work changes more
 
 * ok awesome
 
-*
+* list things
 
-* **Right-click context menu**
+* **Right-click context menu sdfsdf**
 
 ## **Proper padding and styling**
 

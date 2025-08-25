@@ -2,7 +2,7 @@
   "name": "blocknote-markdown-editor",
   "displayName": "BlockNote Markdown Editor",
   "description": "Enhanced markdown editing and preview using BlockNote editor",
-  "version": "0.0.71",
+  "version": "0.0.75",
   "publisher": "jeremy-fletcher",
   "icon": "media/blocknote-icon.png",
   "repository": {
@@ -211,6 +211,7 @@
     "@codemirror/view": "^6.38.1",
     "@lezer/highlight": "^1.2.1",
     "codemirror": "^6.0.2",
+    "mermaid": "^11.10.0",
     "sharp": "^0.34.3"
   }
 }

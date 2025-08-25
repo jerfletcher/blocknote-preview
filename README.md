@@ -5,10 +5,76 @@ A VS Code extension that provides an enhanced markdown editing and preview exper
 ## Features
 
 - Rich text editing for markdown files using BlockNote
+- **Mermaid diagram support** - Create and edit flowcharts, sequence diagrams, and more
+- Toggle between rich editor and markdown text view
 - Custom editor provider that integrates with VS Code
 - Context menu integration for markdown files
 - Real-time preview capabilities
 - Modern TypeScript and React-based architecture
+
+### Mermaid Diagrams
+
+The extension now supports Mermaid diagrams! You can:
+
+1. **Insert diagrams**: Click the 📊 button in rich view or use the built-in block insertion
+2. **Edit existing diagrams**: Click the "Edit" button on any mermaid chart
+3. **View in text mode**: Mermaid code blocks are preserved as standard markdown code blocks with `language-mermaid` class
+
+**Supported diagram types:**
+- Flowcharts
+- Sequence diagrams  
+- Class diagrams
+- State diagrams
+- Entity relationship diagrams
+- User journey diagrams
+- Gantt charts
+- Pie charts
+- Git graphs
+
+**Example usage:**
+```mermaid
+graph TD
+    A[Start] --> B[Process]
+    B --> C{Decision}
+    C -->|Yes| D[Action 1]
+    C -->|No| E[Action 2]
+    D --> F[End]
+    E --> F
+```
+
+## Usage
+
+### Opening Files
+
+1. **Right-click** any `.md` file in the explorer → "Open with BlockNote"
+2. **Use the command palette** (`Ctrl+Shift+P` / `Cmd+Shift+P`) → "Open with BlockNote"
+3. **Set as default** via the `blocknote-markdown-editor.autoOpenBlockNote` setting
+
+### View Modes
+
+- **Rich View** (📝): WYSIWYG editing with BlockNote
+- **Text View** (⟨/⟩): Raw markdown editing with syntax highlighting
+### View Modes
+
+- **Rich View** (📝): WYSIWYG editing with BlockNote
+- **Text View** (⟨/⟩): Raw markdown editing with syntax highlighting
+- **Toggle**: Use `Ctrl+Shift+V` / `Cmd+Shift+V` or click the toggle button
+
+### Keyboard Shortcuts
+
+- `Ctrl+Shift+V` / `Cmd+Shift+V`: Toggle between rich and text view
+- `Ctrl+Shift+M` / `Cmd+Shift+M`: Insert Mermaid diagram (rich view only)
+- `Ctrl+Shift+B` / `Cmd+Shift+B`: Toggle between BlockNote and default editor
+- `Ctrl+Alt+N` / `Cmd+Alt+N`: Create new BlockNote markdown file
+
+### Mermaid Diagrams
+
+1. **Insert new diagram**: 
+   - Click the 📊 button in the toolbar (rich view only)
+   - Use keyboard shortcut: `Ctrl+Shift+M` / `Cmd+Shift+M`
+   - A default flowchart will be inserted
+2. **Edit diagram**: Click the "Edit" button on any mermaid block
+3. **Convert from markdown**: Existing `\`\`\`mermaid` code blocks are automatically converted to interactive diagrams
 
 ## Installation
 

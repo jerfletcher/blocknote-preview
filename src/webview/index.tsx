@@ -3,9 +3,16 @@ import { useRef, useEffect } from 'react';
 import * as ReactDOM from 'react-dom/client';
 import { BlockNoteView } from '@blocknote/mantine';
 import { useCreateBlockNote } from '@blocknote/react';
-import { BlockNoteEditor, BlockNoteSchema, defaultBlockSpecs } from '@blocknote/core';
+import { 
+  BlockNoteEditor, 
+  BlockNoteSchema, 
+  defaultBlockSpecs,
+  getDefaultSlashMenuItems
+} from '@blocknote/core';
+import { createReactBlockSpec } from '@blocknote/react';
 import '@blocknote/core/fonts/inter.css';
 import '@blocknote/mantine/style.css';
+import mermaid from 'mermaid';
 
 // CodeMirror imports - custom setup without line numbers
 import { EditorView } from 'codemirror';
@@ -18,6 +25,209 @@ import { tags } from '@lezer/highlight';
 // VS Code API
 declare const acquireVsCodeApi: () => any;
 const vscode = acquireVsCodeApi();
+
+// Initialize Mermaid
+mermaid.initialize({ 
+  startOnLoad: false,
+  theme: 'default',
+  securityLevel: 'loose',
+  flowchart: {
+    useMaxWidth: true,
+    htmlLabels: true
+  }
+});
+
+// Mermaid React Component
+const MermaidChart: React.FC<{ 
+  code: string; 
+  onEdit: () => void; 
+  theme: 'light' | 'dark';
+}> = ({ code, onEdit, theme }) => {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [error, setError] = React.useState<string | null>(null);
+  const [isRendering, setIsRendering] = React.useState(false);
+
+  useEffect(() => {
+    if (!containerRef.current || !code.trim()) return;
+
+    const renderChart = async () => {
+      setIsRendering(true);
+      setError(null);
+      
+      try {
+        // Update mermaid theme based on VS Code theme
+        mermaid.initialize({
+          startOnLoad: false,
+          theme: theme === 'dark' ? 'dark' : 'default',
+          securityLevel: 'loose',
+          flowchart: {
+            useMaxWidth: true,
+            htmlLabels: true
+          }
+        });
+
+        // Generate unique ID for this chart
+        const id = `mermaid-${Math.random().toString(36).substr(2, 9)}`;
+        
+        // Validate and render the diagram
+        const { svg } = await mermaid.render(id, code.trim());
+        
+        if (containerRef.current) {
+          containerRef.current.innerHTML = svg;
+        }
+      } catch (err) {
+        console.error('Mermaid rendering error:', err);
+        setError(err instanceof Error ? err.message : 'Failed to render diagram');
+        if (containerRef.current) {
+          containerRef.current.innerHTML = '';
+        }
+      } finally {
+        setIsRendering(false);
+      }
+    };
+
+    renderChart();
+  }, [code, theme]);
+
+  if (!code.trim()) {
+    return (
+      <div 
+        style={{
+          border: '2px dashed var(--vscode-textBlockQuote-border, #007acc)',
+          borderRadius: '8px',
+          padding: '20px',
+          textAlign: 'center',
+          color: 'var(--vscode-textBlockQuote-foreground, #cccccc)',
+          backgroundColor: 'var(--vscode-textBlockQuote-background, rgba(0, 122, 204, 0.1))',
+          cursor: 'pointer',
+          minHeight: '60px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center'
+        }}
+        onClick={onEdit}
+      >
+        Click to add Mermaid diagram
+      </div>
+    );
+  }
+
+  return (
+    <div style={{ position: 'relative', width: '100%' }}>
+      {/* Edit button */}
+      <button
+        onClick={onEdit}
+        style={{
+          position: 'absolute',
+          top: '8px',
+          right: '8px',
+          zIndex: 10,
+          background: 'var(--vscode-button-background, #0e639c)',
+          color: 'var(--vscode-button-foreground, white)',
+          border: 'none',
+          borderRadius: '4px',
+          padding: '4px 8px',
+          fontSize: '12px',
+          cursor: 'pointer',
+          opacity: 0.7
+        }}
+        onMouseEnter={(e) => { e.currentTarget.style.opacity = '1'; }}
+        onMouseLeave={(e) => { e.currentTarget.style.opacity = '0.7'; }}
+      >
+        Edit
+      </button>
+      
+      {isRendering && (
+        <div style={{
+          padding: '20px',
+          textAlign: 'center',
+          color: 'var(--vscode-foreground, #cccccc)'
+        }}>
+          Rendering diagram...
+        </div>
+      )}
+      
+      {error && (
+        <div style={{
+          padding: '20px',
+          background: 'var(--vscode-inputValidation-errorBackground, rgba(244, 67, 54, 0.1))',
+          border: '1px solid var(--vscode-inputValidation-errorBorder, #f44336)',
+          borderRadius: '4px',
+          color: 'var(--vscode-inputValidation-errorForeground, #f44336)',
+          fontSize: '14px'
+        }}>
+          <strong>Mermaid Error:</strong> {error}
+        </div>
+      )}
+      
+      <div 
+        ref={containerRef}
+        style={{
+          width: '100%',
+          textAlign: 'center',
+          backgroundColor: 'var(--vscode-editor-background)',
+          padding: '10px',
+          borderRadius: '4px',
+          display: error ? 'none' : 'block'
+        }}
+      />
+    </div>
+  );
+};
+
+// Mermaid Block Spec
+const MermaidBlock = createReactBlockSpec(
+  {
+    type: "mermaid" as const,
+    propSchema: {
+      code: {
+        default: "" as const,
+      },
+    },
+    content: "none",
+  },
+  {
+    render: (props) => {
+      const theme = getVSCodeTheme();
+      
+      return (
+        <MermaidChart
+          code={props.block.props.code}
+          theme={theme}
+          onEdit={() => {
+            const newCode = prompt("Enter Mermaid diagram code:", props.block.props.code);
+            if (newCode !== null) {
+              props.editor.updateBlock(props.block, {
+                type: "mermaid",
+                props: { code: newCode },
+              });
+            }
+          }}
+        />
+      );
+    },
+    toExternalHTML: (props) => {
+      // Export as proper markdown code block
+      return `\`\`\`mermaid\n${props.block.props.code}\n\`\`\``;
+    },
+    parse: (element) => {
+      console.log('=== PARSE DEBUG ===');
+      console.log('Parsing element:', element.tagName, element.getAttribute('data-content-type'));
+      
+      // Handle direct mermaid block markers
+      if (element.tagName === "DIV" && element.getAttribute("data-content-type") === "mermaid") {
+        const encodedCode = element.getAttribute("data-code");
+        if (encodedCode) {
+          const code = decodeURIComponent(encodedCode);
+          console.log('Successfully parsed mermaid block with code:', code);
+          return { code };
+        }
+      }
+      console.log('Parse failed for element');
+      return undefined;
+    },
+  }
+);
 
 // Function to parse and extract front matter from markdown
 function parseFrontMatter(markdown: string): { content: string; frontMatter: any } {
@@ -89,6 +299,55 @@ function getVSCodeTheme(): 'light' | 'dark' {
   
   // Fallback: check for VS Code theme class or default to dark
   return document.body.classList.contains('vscode-light') ? 'light' : 'dark';
+}
+
+// Function to transform markdown with mermaid code blocks to custom blocks
+function transformMermaidCodeBlocks(markdown: string): string {
+  console.log('=== TRANSFORM DEBUG ===');
+  console.log('Input markdown:', markdown);
+  
+  // Instead of HTML transformation, let's manually convert the markdown
+  const lines = markdown.split('\n');
+  const result: string[] = [];
+  let i = 0;
+  
+  while (i < lines.length) {
+    const line = lines[i];
+    
+    // Check if this line starts a mermaid code block
+    if (line.trim() === '```mermaid') {
+      console.log('Found mermaid block start at line', i);
+      // Find the end of the code block
+      let j = i + 1;
+      const codeLines: string[] = [];
+      
+      while (j < lines.length && lines[j].trim() !== '```') {
+        codeLines.push(lines[j]);
+        j++;
+      }
+      
+      if (j < lines.length) {
+        // Found the closing ```, create a custom block marker
+        const mermaidCode = codeLines.join('\n');
+        console.log('Mermaid code found:', mermaidCode);
+        result.push(`<div data-content-type="mermaid" data-code="${encodeURIComponent(mermaidCode)}"></div>`);
+        i = j + 1; // Skip past the closing ```
+      } else {
+        // No closing ```, treat as regular line
+        result.push(line);
+        i++;
+      }
+    } else {
+      result.push(line);
+      i++;
+    }
+  }
+  
+  const transformed = result.join('\n');
+  console.log('Transformed result:', transformed);
+  console.log('=== END TRANSFORM DEBUG ===');
+  
+  return transformed;
 }
 
 // CodeMirror Editor Component
@@ -191,10 +450,11 @@ const BlockNoteEditorComponent: React.FC<BlockNoteEditorComponentProps> = ({
   const hasInitializedContent = React.useRef(false);
   const frontMatterRef = React.useRef<any>({});
   
-  const editor: BlockNoteEditor = useCreateBlockNote({
+  const editor = useCreateBlockNote({
     schema: BlockNoteSchema.create({
       blockSpecs: {
         ...defaultBlockSpecs,
+        mermaid: MermaidBlock,
       },
     }),
     // Enable file upload (can be undefined to disable)
@@ -355,8 +615,23 @@ const BlockNoteEditorComponent: React.FC<BlockNoteEditorComponentProps> = ({
           isUpdatingFromVSCode.current = true; // Prevent save during sync
           
           if (contentWithoutFrontMatter.trim()) {
-            const blocks = await editor.tryParseMarkdownToBlocks(contentWithoutFrontMatter);
-            editor.replaceBlocks(editor.document, blocks);
+            const transformedContent = transformMermaidCodeBlocks(contentWithoutFrontMatter);
+            console.log('Original content:', contentWithoutFrontMatter.substring(0, 200));
+            console.log('Transformed content:', transformedContent.substring(0, 200));
+            
+            try {
+              const blocks = await editor.tryParseMarkdownToBlocks(transformedContent);
+              console.log('Parsed blocks count:', blocks.length);
+              console.log('First few blocks:', blocks.slice(0, 3));
+              editor.replaceBlocks(editor.document, blocks);
+            } catch (error) {
+              console.error('Error parsing markdown to blocks:', error);
+              // Fallback to plain text
+              editor.replaceBlocks(editor.document, [{
+                type: "paragraph" as const,
+                content: contentWithoutFrontMatter
+              }]);
+            }
           } else {
             // For empty content, create a single empty paragraph with proper typing
             const emptyBlocks = [{
@@ -452,8 +727,22 @@ const BlockNoteEditorComponent: React.FC<BlockNoteEditorComponentProps> = ({
             console.log('Front matter extracted:', frontMatter);
             
             if (contentWithoutFrontMatter.trim()) {
-              const blocks = await editor.tryParseMarkdownToBlocks(contentWithoutFrontMatter);
-              editor.replaceBlocks(editor.document, blocks);
+              const transformedContent = transformMermaidCodeBlocks(contentWithoutFrontMatter);
+              console.log('Setting content from update, original:', contentWithoutFrontMatter.substring(0, 100));
+              console.log('Setting content from update, transformed:', transformedContent.substring(0, 100));
+              
+              try {
+                const blocks = await editor.tryParseMarkdownToBlocks(transformedContent);
+                console.log('Parsed blocks from content update:', blocks.length);
+                editor.replaceBlocks(editor.document, blocks);
+              } catch (error) {
+                console.error('Error parsing content update:', error);
+                // Fallback 
+                editor.replaceBlocks(editor.document, [{
+                  type: "paragraph" as const,
+                  content: contentWithoutFrontMatter
+                }]);
+              }
             }
             // If content is empty, BlockNote will default to empty paragraph, which is fine
           }
@@ -475,7 +764,7 @@ const BlockNoteEditorComponent: React.FC<BlockNoteEditorComponentProps> = ({
 
   return (
     <div style={{ height: '100%', width: '100%', position: 'relative' }}>
-      {/* Toggle Button - Fixed at Top */}
+      {/* Toggle Button - Fixed at Top Right */}
       <button
         onClick={() => handleViewModeChange(viewMode === 'rich' ? 'text' : 'rich')}
         title={viewMode === 'rich' ? 'Switch to Markdown Text View' : 'Switch to Rich Editor View'}
